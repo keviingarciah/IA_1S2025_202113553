@@ -1,17 +1,16 @@
-// Definimos los estados posibles
-const possibleStates = [
-  { location: "A", stateA: "SUCIO", stateB: "SUCIO" },
-  { location: "A", stateA: "SUCIO", stateB: "LIMPIO" },
-  { location: "A", stateA: "LIMPIO", stateB: "SUCIO" },
-  { location: "A", stateA: "LIMPIO", stateB: "LIMPIO" },
-  { location: "B", stateA: "SUCIO", stateB: "SUCIO" },
-  { location: "B", stateA: "SUCIO", stateB: "LIMPIO" },
-  { location: "B", stateA: "LIMPIO", stateB: "SUCIO" },
-  { location: "B", stateA: "LIMPIO", stateB: "LIMPIO" },
-];
-
-// Set para trackear estados visitados
+// Conjunto para rastrear estados visitados
 const visitedStates = new Set();
+
+function getStateString(states) {
+  return `${states[0]}-${states[1]}-${states[2]}`;
+}
+
+function updateLog(message) {
+  const logElement = document.getElementById("log");
+  logElement.innerHTML += message;
+  // Hacer scroll hasta el final automáticamente
+  logElement.scrollTop = logElement.scrollHeight;
+}
 
 function reflex_agent(location, state) {
   if (state == "SUCIO") return "LIMPIAR";
@@ -19,79 +18,54 @@ function reflex_agent(location, state) {
   else if (location == "B") return "IZQUIERDA";
 }
 
-function checkAllStatesVisited(states) {
-  const stateKey = `${states[0]}-${states[1]}-${states[2]}`;
-  visitedStates.add(stateKey);
-  return visitedStates.size === 8;
-}
-
-function simulateDirty(states) {
-  if (states[1] === "LIMPIO" && states[2] === "LIMPIO") {
-    // Simular ensuciamiento
-    for (const possibleState of possibleStates) {
-      const stateKey = `${states[0]}-${possibleState.stateA}-${possibleState.stateB}`;
-      if (!visitedStates.has(stateKey)) {
-        if (states[1] === "LIMPIO" && possibleState.stateA === "SUCIO") {
-          states[1] = "SUCIO";
-          document.getElementById("log").innerHTML +=
-            "<br>Acción externa: Ensuciar A";
-          break;
-        } else if (states[2] === "LIMPIO" && possibleState.stateB === "SUCIO") {
-          states[2] = "SUCIO";
-          document.getElementById("log").innerHTML +=
-            "<br>Acción externa: Ensuciar B";
-          break;
-        }
-      }
-    }
-  }
-}
-
 function test(states) {
   var location = states[0];
   var state = states[0] == "A" ? states[1] : states[2];
   var action_result = reflex_agent(location, state);
 
-  // Imprimir estado actual
-  document.getElementById("log").innerHTML += "<br><br><b>Posición actual: "
-    .concat(location)
-    .concat(" | A = ")
-    .concat(states[1])
-    .concat(", B = ")
-    .concat(states[2])
-    .concat("</b>");
+  // Agregar estado actual al conjunto de estados visitados
+  const currentState = getStateString(states);
+  visitedStates.add(currentState);
 
-  document.getElementById("log").innerHTML += "<br>Acción: ".concat(
-    action_result
+  // Mostrar cantidad de estados visitados
+  updateLog(`<br>Estados únicos visitados: ${visitedStates.size} de 8`);
+
+  // Verificar si se han visitado todos los estados posibles
+  if (visitedStates.size === 8) {
+    updateLog(
+      "<br><br>¡Se han visitado todos los estados posibles! Terminando..."
+    );
+    return; // Terminar la ejecución
+  }
+
+  // Verificar si ambos estados están limpios
+  if (states[1] == "LIMPIO" && states[2] == "LIMPIO") {
+    var random = Math.floor(Math.random() * 2);
+    if (random === 0) {
+      states[1] = "SUCIO";
+      updateLog("<br>Se ensució la ubicación A");
+    } else {
+      states[2] = "SUCIO";
+      updateLog("<br>Se ensució la ubicación B");
+    }
+  }
+
+  updateLog(
+    "<br>Ubicación: "
+      .concat(location)
+      .concat(" | Acción: ")
+      .concat(action_result)
   );
 
-  // Actualizar estados según la acción
   if (action_result == "LIMPIAR") {
     if (location == "A") states[1] = "LIMPIO";
     else if (location == "B") states[2] = "LIMPIO";
   } else if (action_result == "DERECHA") states[0] = "B";
   else if (action_result == "IZQUIERDA") states[0] = "A";
 
-  // Verificar si todos los estados han sido visitados
-  if (checkAllStatesVisited(states)) {
-    document.getElementById("log").innerHTML +=
-      "<br><br><b>Todos los estados posibles han sido visitados</b>";
-    return;
-  }
-
-  // Simular ensuciamiento si es necesario
-  simulateDirty(states);
-
-  // Verificar nuevamente después de ensuciar
-  if (checkAllStatesVisited(states)) {
-    document.getElementById("log").innerHTML +=
-      "<br><br><b>Todos los estados posibles han sido visitados</b>";
-    return;
-  }
-
   setTimeout(function () {
     test(states);
-  }, 2000);
+  }, 700);
 }
 
 var states = ["A", "SUCIO", "SUCIO"];
