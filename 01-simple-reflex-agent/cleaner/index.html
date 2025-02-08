@@ -59,6 +59,33 @@
             width: 80%;
             max-width: 800px;
         }
+
+        .github-link {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background-color: #24292e;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .github-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .github-link img {
+            width: 20px;
+            height: 20px;
+        }
     </style>
 </head>
 <body>
@@ -66,6 +93,14 @@
         <h2>Agente Reflexivo Simple: Aspiradora</h2>
         <div id="log"></div>
     </div>
+
+    <a href="https://github.com/keviingarciah/IA_1S2025_202113553" 
+       target="_blank" 
+       class="github-link">
+        <img src="https://github.com/fluidicon.png" alt="GitHub Icon">
+        Ver en GitHub
+    </a>
+
     <script type="text/javascript" src="cleaner.js"></script>
 </body>
 </html>
